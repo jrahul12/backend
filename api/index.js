@@ -225,15 +225,14 @@ let users = [
     }
 ]
 
-let nextId = 6;
-
 app.get('/api/users', (req, res) => {
     res.json(users);
 });
 
-app.get('/api/users/:id', (req, res) => {
-    const id = parseInt(req.params.id);
-    const user = users.find(u => u.id === id);
+app.get('/api/users/:userId', (req, res) => {
+    const { userId } = req.params;
+
+    const user = users.find(u => u.userId === userId);
 
     if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -243,52 +242,41 @@ app.get('/api/users/:id', (req, res) => {
 });
 
 app.post('/api/users', (req, res) => {
-    const { name, email, address, role } = req.body;
+    const newUser = req.body;
 
-    if (!name || !email || !address || !role) {
-        return res.status(400).json({ message: "All fields are required" });
+    if (!newUser.userId) {
+        return res.status(400).json({ message: "userId is required" });
     }
-
-    const newUser = {
-        id: nextId++,
-        name,
-        email,
-        address,
-        role
-    };
 
     users.push(newUser);
 
     res.status(201).json(newUser);
 });
 
-app.put('/api/users/:id', (req, res) => {
-    const id = parseInt(req.params.id);
-    const user = users.find(u => u.id === id);
+app.put('/api/users/:userId', (req, res) => {
+    const { userId } = req.params;
+
+    const user = users.find(u => u.userId === userId);
 
     if (!user) {
         return res.status(404).json({ message: "User not found" });
     }
 
-    const { name, email, address, role } = req.body;
-
-    if (name) user.name = name;
-    if (email) user.email = email;
-    if (address) user.address = address;
-    if (role) user.role = role;
+    Object.assign(user, req.body);
 
     res.json(user);
 });
 
-app.delete('/api/users/:id', (req, res) => {
-    const id = parseInt(req.params.id);
-    const userIndex = users.findIndex(u => u.id === id);
+app.delete('/api/users/:userId', (req, res) => {
+    const { userId } = req.params;
 
-    if (userIndex === -1) {
+    const index = users.findIndex(u => u.userId === userId);
+
+    if (index === -1) {
         return res.status(404).json({ message: "User not found" });
     }
 
-    const deletedUser = users.splice(userIndex, 1);
+    const deletedUser = users.splice(index, 1);
 
     res.json(deletedUser[0]);
 });
