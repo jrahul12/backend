@@ -6,7 +6,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-
 let users = [
     { id: 1, name: "Rahul", email: "rahul@gmail.com", address: "Hyderabad", role: "Frontend Developer" },
     { id: 2, name: "Amit", email: "amit@gmail.com", address: "Mumbai", role: "Backend Developer" },
@@ -17,42 +16,26 @@ let users = [
 
 let nextId = 6;
 
-
 app.get('/api/users', (req, res) => {
-    res.status(200).json({
-        success: true,
-        count: users.length,
-        data: users
-    });
+    res.json(users);
 });
 
 app.get('/api/users/:id', (req, res) => {
-
     const id = parseInt(req.params.id);
     const user = users.find(u => u.id === id);
 
     if (!user) {
-        return res.status(404).json({
-            success: false,
-            message: "User not found"
-        });
+        return res.status(404).json({ message: "User not found" });
     }
 
-    res.status(200).json({
-        success: true,
-        data: user
-    });
+    res.json(user);
 });
 
 app.post('/api/users', (req, res) => {
-
     const { name, email, address, role } = req.body;
 
     if (!name || !email || !address || !role) {
-        return res.status(400).json({
-            success: false,
-            message: "All fields are required"
-        });
+        return res.status(400).json({ message: "All fields are required" });
     }
 
     const newUser = {
@@ -65,23 +48,15 @@ app.post('/api/users', (req, res) => {
 
     users.push(newUser);
 
-    res.status(201).json({
-        success: true,
-        message: "User created successfully",
-        data: newUser
-    });
+    res.status(201).json(newUser);
 });
 
 app.put('/api/users/:id', (req, res) => {
-
     const id = parseInt(req.params.id);
     const user = users.find(u => u.id === id);
 
     if (!user) {
-        return res.status(404).json({
-            success: false,
-            message: "User not found"
-        });
+        return res.status(404).json({ message: "User not found" });
     }
 
     const { name, email, address, role } = req.body;
@@ -91,36 +66,21 @@ app.put('/api/users/:id', (req, res) => {
     if (address) user.address = address;
     if (role) user.role = role;
 
-    res.status(200).json({
-        success: true,
-        message: "User updated successfully",
-        data: user
-    });
+    res.json(user);
 });
 
-
 app.delete('/api/users/:id', (req, res) => {
-
     const id = parseInt(req.params.id);
     const userIndex = users.findIndex(u => u.id === id);
 
     if (userIndex === -1) {
-        return res.status(404).json({
-            success: false,
-            message: "User not found"
-        });
+        return res.status(404).json({ message: "User not found" });
     }
 
     const deletedUser = users.splice(userIndex, 1);
 
-    res.status(200).json({
-        success: true,
-        message: "User deleted successfully",
-        data: deletedUser[0]
-    });
+    res.json(deletedUser[0]);
 });
-
-
 
 if (require.main === module) {
     app.listen(5000, () => {
